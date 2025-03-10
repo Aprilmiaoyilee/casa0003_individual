@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Endangered Languages Clusters</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+<!-- Load the Mapbox Geocoder plugin -->
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Import Cardo font from Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<!-- Import D3  -->  
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<style>
+body { 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Cardo', serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* New darker background color from the palette */
+    background-color: #181C14;
+    overflow: hidden;
+    color: #ECDFCC;
+}
+
+/* Title bar styles - now integrated with background */
+#title-bar {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    z-index: 10;
+}
+
+#title-bar h1 {
+    margin: 0;
+    font-size: 32px;
+    font-family: 'Cardo', serif;
+    font-weight: 700;
+    color: #ECDFCC;
+}
+
+/* Main content container */
+.content-container {
+    display: flex;
+    flex: 1;
+    padding: 0 20px 20px 20px;
+    height: calc(100vh - 80px);
+    box-sizing: border-box;
+}
+
+/* Left sidebar styles */
+#left-bar {
+    width: 400px;
+    background-color: #3C3D37;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#left-bar h2 {
+    margin-top: 0;
+    color: #ECDFCC;
+    border-bottom: 2px solid #697565;
+    padding-bottom: 10px;
+    font-size: 20px;
+    font-family: 'Cardo', serif;
+    font-weight: 700;
+}
+
+#left-bar p {
+    line-height: 1.6;
+    color: #ECDFCC;
+    font-size: 15px;
+    font-family: 'Cardo', serif;
+}
+
+#left-bar a {
+    font-family: 'Cardo', serif;
+    color: #ECDFCC;
+    text-decoration: underline;
+}
+
+#left-bar a:hover {
+    color: #697565;
+}
+
+/* Pages in sidebar */
+.page {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+.page-content {
+    flex-grow: 1;
+    margin-bottom: 20px; /* Add some space for the navigation button */
+}
+
+.page.active {
+    display: flex;
+}
+
+/* Navigation buttons for sidebar - MODIFIED */
+.nav-button-container {
+    position: absolute;
+    bottom: -10px;
+    right: 20px;
+    z-index: 100;
+}
+
+.nav-button {
+    background-color: #697565;
+    color: #ECDFCC;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    opacity: 0.8 !important;
+    visibility: visible !important;
+}
+
+.nav-button:hover {
+    background-color: #ECDFCC;
+    color: #3C3D37;
+}
+
+/* Map container */
+#map-container {
+    flex: 1;
+    position: relative;
+    background-color: #3C3D37;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+#map { 
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+/* Style the geocoder dropdown menu */
+.mapboxgl-ctrl-geocoder .suggestions {
+    background-color: rgba(60, 61, 55, 0.9);
+    border-radius: 5px;
+}
+
+.mapboxgl-ctrl-geocoder .suggestions > li > a {
+    color: #ECDFCC;
+}
+
+.mapboxgl-ctrl-geocoder .suggestions > .active > a,
+.mapboxgl-ctrl-geocoder .suggestions > li > a:hover {
+    background-color: rgba(105, 117, 101, 0.5);
+}
+
+/* Style the geocoder close button */
+.mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--button {
+    background-color: transparent;
+}
+
+.mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--button-close {
+    fill: #ECDFCC;
+}
+
+/* Style the navigation controls */
+.mapboxgl-ctrl-group {
+    background-color: rgba(60, 61, 55, 0.8);
+    border-radius: 5px;
+    box-shadow: none;
+    margin-top: 60px;  /* Position below Toggle Clustering button */
+}
+
+.mapboxgl-ctrl-group button {
+    background-color: transparent;
+}
+
+.mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+    filter: invert(1);  /* Make icons white */
+}
+
+/* Makes the separator line between buttons white */
+.mapboxgl-ctrl-group:not(:empty) {
+    box-shadow: none;
+}
+
+.mapboxgl-ctrl-group:not(:empty) button {
+    border-color: rgba(105, 117, 101, 0.5);
+}
+
+#menu {
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    background: rgba(60, 61, 55, 0.8);
+    padding: 8px 12px;
+    border-radius: 4px;
+    z-index: 1;
+    color: #ECDFCC;
+}
+
+#menu input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #ECDFCC;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+#menu input[type="checkbox"]:checked {
+    background-color: transparent;
+    border-color: #697565;
+}
+
+#menu input[type="checkbox"]:checked:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: #51bbd6;
+    border-radius: 50%;
+}
+
+#menu label {
+    font-size: 14px;
+    vertical-align: middle;
+    cursor: pointer;
+    color: #ECDFCC;
+}
+
+.mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.mapboxgl-popup-content {
+    background-color: #3C3D37;
+    color: #ECDFCC;
+    border-radius: 4px;
+}
+
+.mapboxgl-popup-content strong,
+.mapboxgl-popup-content span,
+.mapboxgl-popup-content div,
+.mapboxgl-attribution-control,
+.mapboxgl-ctrl-attrib {
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+    color: #ECDFCC;
+}
+
+.mapboxgl-popup-close-button {
+    color: #ECDFCC;
+}
+
+/* Geocoder container styling */
+.geocoder-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    width: 300px;
+}
+
+/* Style the geocoder input */
+.mapboxgl-ctrl-geocoder {
+    width: 100%;
+    max-width: 100%;
+    box-shadow: none;
+    background-color: rgba(60, 61, 55, 0.8);
+    border-radius: 5px;
+}
+
+/* Style the geocoder input text and placeholder */
+.mapboxgl-ctrl-geocoder input[type='text'] {
+    color: #ECDFCC;
+    background-color: transparent;
+}
+
+.mapboxgl-ctrl-geocoder input::placeholder {
+    color: rgba(236, 223, 204, 0.8);
+}
+
+/* Style the geocoder search icon */
+.mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search {
+    fill: #ECDFCC;
+}
+
+/* Legend Styles */
+.legend-container {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(60, 61, 55, 0.8);
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: #ECDFCC;
+    z-index: 1;
+}
+
+.legend-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.legend-container li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Colors for each category based on your image */
+.at-risk .dot { background-color: #8CC63F; }
+.endangered .dot { background-color: #F7941D; }
+.severely-endangered .dot { background-color: #ED1C24; }
+.dormant .dot { background-color: #00AEEF; }
+.awakening .dot { background-color: #662D91; }
+.vitality-unknown .dot { background-color: #939598; }
+
+/* Add section for stats in the sidebar */
+.stats-container {
+    margin-top: 20px;
+    background-color: rgba(105, 117, 101, 0.3);
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    font-family: 'Cardo', serif;
+    text-align: center;
+}
+
+.stats-container h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-family: 'Cardo', serif;
+    font-weight: 700;
+    text-align: center;
+    color: #ECDFCC;
+}
+
+.stats-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(236, 223, 204, 0.2);
+}
+
+.stats-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.stats-label {
+    font-weight: bold;
+    font-family: 'Cardo', serif;
+    display: block;
+    margin-bottom: 5px;
+    color: #ECDFCC;
+}
+
+/* Style for the D3 chart container on page 2 */
+#chart-container {
+    width: 100%;
+    height: 400px; 
+    margin-top: 10px;
+    background-color: rgba(105, 117, 101, 0.3);
+    border-radius: 5px;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.chart-header {
+    flex: 0 0 auto;
+    margin-bottom: 5px;
+}
+
+.chart-header h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: #ECDFCC;
+} 
+
+.chart-content {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+    
+/* Style for the D3 chart on page 2 */   
+#country-input {
+    width: calc(100% - 10px);
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid #697565;
+    background-color: rgba(60, 61, 55, 0.8);
+    color: #ECDFCC;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    height: 28px;
+    box-sizing: border-box;
+}
+
+#country-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: calc(100% - 10px);
+  max-height: 150px;
+  font-size: 14px;
+  overflow-y: auto;
+  display: none;
+  position: absolute;
+  z-index: 10;
+  background-color: rgba(60, 61, 55, 0.9);
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 4px;
+  top: 70px;
+  left: 10px;
+}
+
+#country-list li {
+  border: 1px solid #697565;
+  margin-top: -1px;
+  background-color: rgba(60, 61, 55, 0.8);
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #ECDFCC;
+  display: block;
+  cursor: pointer;
+}
+
+#country-list li:hover {
+  background-color: #697565;
+}
+
+#search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.bar:hover {
+  opacity: 0.8;
+}
+
+#error-message {
+  color: #f28cb1;
+  display: none;
+  margin-top: 2px;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+#my_dataviz {
+    width: 100%;
+    height: 100%;
+}
+    
+</style>
+</head>
+<body>
+    <!-- Title Bar -->
+    <div id="title-bar">
+        <h1>Endangered Languages Worldwide</h1>
+    </div>
+    
+    <!-- Main Content Container -->
+    <div class="content-container">
+        <!-- Left Sidebar -->
+        <div id="left-bar">
+            <!-- Page 1 -->
+            <div id="page1" class="page active">
+                <div class="page-content">
+                    <h2>I Regions that are experiencing serious damage to linguistic diversity?</h2>
+                    <p>This interactive map visualizes endangered languages around the world, categorized by their endangerment levels. The <a href="https://www.endangeredlanguages.com/userquery/">data</a> shows the linguistic diversity at risk worldwide, indicating a huge loss of scientific information and cultural knowledge. But luckily, some actions have been taken to awake endangered languages.</p>
+                    
+                    <p>Each colored dot represents a language in different <a href="https://www.endangeredlanguages.com/about_catalogue/">endangerment levels</a> (vitality status) and the  
+                    <span style="color: #f28cb1; font-weight: bold;">pink</span>- 
+                    <span style="color: #f1f075; font-weight: bold;">yellow</span>- 
+                    <span style="color: #51bbd6; font-weight: bold;">blue</span> clusters indicate number of endangered languages in those regions. 
+                    Explore linguistic diversity with search box on map.</p>
+                    
+                    <div class="stats-container">
+                        <h3><strong>Global Statistics</strong></h3>
+                        <div class="stats-item">
+                            <span class="stats-label">Total Endangered Languages:</span>
+                            <span>3,000+</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Most Affected Region:</span>
+                            <span>America and Southeast Asia</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">Most Affected Language Family:</span>
+                            <span>Austronesian</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation button is now in a proper container positioned at bottom-right -->
+                <div class="nav-button-container">
+                    <button class="nav-button" onclick="showPage(2)">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Page 2 -->
+            <div id="page2" class="page">
+                <div class="page-content">
+                    <h2>II How about the situation of endangered languages in your living country?</h2>
+                    <p>Now take a look at the situation in your living country by using the search box below. Then you may have a clear picture of language extinction trends that are happening around you. If you have resources about endangered languages, feel free to share on <a href="https://www.endangeredlanguages.com/resources/">Endangered Languages Project</a>.</p>
+                    
+                    <div id="chart-container">
+                        <div class="chart-header">
+                            <h3>Endangered Languages by Country</h3>
+                            <div id="search-container">
+                                <input type="text" id="country-input" placeholder="Enter country name">
+                                <p id="error-message">Country not found in the dataset</p>
+                            </div>
+                        </div>
+                        <ul id="country-list"></ul>
+                        <div class="chart-content">
+                            <div id="my_dataviz"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Navigation button is now in a proper container positioned at bottom-right -->
+                <div class="nav-button-container">
+                    <button class="nav-button" onclick="showPage(1)">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Container -->
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="menu">
+                <input id="clustering-toggle" type="checkbox" checked>
+                <label for="clustering-toggle">Clustering</label>
+            </div>
+            <div id="legend" class="legend-container">
+                <ul>
+                    <li class="at-risk"><span class="dot"></span> AT RISK</li>
+                    <li class="endangered"><span class="dot"></span> ENDANGERED</li>
+                    <li class="severely-endangered"><span class="dot"></span> SEVERELY ENDANGERED</li>
+                    <li class="dormant"><span class="dot"></span> DORMANT</li>
+                    <li class="awakening"><span class="dot"></span> AWAKENING</li>
+                    <li class="vitality-unknown"><span class="dot"></span> VITALITY UNKNOWN</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+<!-- Page 1 navigation buttom js--->
+<script>
+    
+    // Page navigation function
+    function showPage(pageNum) {
+    // Switch the active page
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.getElementById('page' + pageNum).classList.add('active');
+    
+    // Set a flag indicating page2 is now active
+        if (pageNum === 2) {
+        // Use a global variable that the D3 script can check
+            window.page2Active = true;
+            console.log("Page 2 activated, setting flag for chart loading");
+        }
+    }
+</script>
+<!-- map js--->    
+<script>  
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYXByaWxtaWFveWkiLCJhIjoiY2sxczBkbGliMDl4ZTNtcGdncjQzbG12cCJ9.XozBXQ22Zoca873cTizj_A';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/aprilmiaoyi/cm80qt72i00uv01s50rg7ez70',
+        center: [20, -20],
+        zoom: 1,
+        attributionControl: false // Disable default attribution to create custom one
+    });
+    
+    <!-- Add custom attribution with data source -->
+    map.addControl(new mapboxgl.AttributionControl({
+        customAttribution: '<a href="https://www.endangeredlanguages.com/userquery/" target="_blank" style="font-family: \'Helvetica Neue\', Arial, Helvetica, sans-serif; color: #000000;">Data Source: Endangered Languages Project</a>'
+    }));
+    
+    // Add the geocoder search control to the top center of the map
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        placeholder: 'Search for a country or region',
+        marker: false // Don't add a marker when selecting a result
+    });
+    
+    // Create a custom container for the geocoder
+    const geocoderContainer = document.createElement('div');
+    geocoderContainer.className = 'geocoder-container';
+    document.getElementById('map').appendChild(geocoderContainer);
+    
+    // Append the geocoder to our custom container
+    geocoderContainer.appendChild(geocoder.onAdd(map));
+    
+    // Add zoom and rotation controls directly to the map in the top-right position
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    let isClusteringEnabled = true;
+
+    map.on('load', () => {
+        // Add source for endangered languages
+        map.addSource('endangered-languages', {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/Aprilmiaoyilee/casa0003_individual/main/endangered_languages.geojson',
+            cluster: true,
+            clusterMaxZoom: 4, // Lower the max zoom for clustering
+            clusterRadius: 50
+        });
+
+        // Add a transparent layer for clickable points
+        map.addLayer({
+            id: 'point-layer',
+            type: 'circle',
+            source: 'endangered-languages',
+            paint: {
+                'circle-radius': 5,
+                'circle-color': 'transparent',
+                'circle-stroke-width': 0
+            }
+        });
+
+        // Add a layer for clusters
+        map.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            source: 'endangered-languages',
+            filter: ['has', 'point_count'],
+            paint: {
+                'circle-color': [
+                    'step',
+                    ['get', 'point_count'],
+                    '#51bbd6',
+                    3,
+                    '#f1f075',
+                    10,
+                    '#f28cb1'
+                ],
+                'circle-radius': [
+                    'step',
+                    ['get', 'point_count'],
+                    20,
+                    3,
+                    30,
+                    10,
+                    40
+                ]
+            }
+        });
+
+        // Add a layer for cluster counts
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'endangered-languages',
+            filter: ['has', 'point_count'],
+            layout: {
+                'text-field': ['get', 'point_count_abbreviated'],
+                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                'text-size': 12
+            }
+        });
+
+        // Click event to handle both clusters and individual points
+        map.on('click', (e) => {
+            const clusterFeatures = map.queryRenderedFeatures(e.point, {
+                layers: ['clusters']
+            });
+
+            // If it's a cluster, zoom in
+            if (clusterFeatures.length > 0) {
+                const clusterId = clusterFeatures[0].properties.cluster_id;
+                map.getSource('endangered-languages').getClusterExpansionZoom(
+                    clusterId,
+                    (err, zoom) => {
+                        if (err) return;
+                        map.easeTo({
+                            center: clusterFeatures[0].geometry.coordinates,
+                            zoom: zoom
+                        });
+                    }
+                );
+                return;
+            }
+
+            // Try to find a point feature using the transparent point layer
+            const pointFeatures = map.queryRenderedFeatures(e.point, {
+                layers: ['point-layer']
+            });
+
+            if (pointFeatures.length > 0) {
+                const feature = pointFeatures[0];
+                const coordinates = feature.geometry.coordinates.slice();
+                const language = feature.properties.language;
+                const level = feature.properties.level;
+                const speakers = feature.properties.speakers;
+                const languageFamily = feature.properties.language_family;
+                const places = feature.properties.places;
+
+                // Ensure popup appears over the correct point when map is zoomed out
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(
+                        `<strong>Language:</strong> ${language}<br>` +
+                        `<strong>Endangerment Level:</strong> ${level}<br>` +
+                        `<strong>Speakers:</strong> ${speakers}<br>` +
+                        `<strong>Language Family:</strong> ${languageFamily}<br>` +
+                        `<strong>Places:</strong> ${places}`
+                    )
+                    .addTo(map);
+            }
+        });
+
+        // Toggle clustering button functionality
+        document.getElementById('clustering-toggle').addEventListener('change', (e) => {
+            isClusteringEnabled = e.target.checked;
+            
+            // Modify the source to enable/disable clustering
+            map.getSource('endangered-languages').setData({
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/Aprilmiaoyilee/casa0003_individual/main/endangered_languages.geojson',
+                cluster: isClusteringEnabled,
+                clusterMaxZoom: 14,
+                clusterRadius: 50
+            });
+
+            // Show/hide layers based on clustering state
+            if (isClusteringEnabled) {
+                map.setLayoutProperty('clusters', 'visibility', 'visible');
+                map.setLayoutProperty('cluster-count', 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty('clusters', 'visibility', 'none');
+                map.setLayoutProperty('cluster-count', 'visibility', 'none');
+            }
+        });
+
+        // Change cursor to pointer when over clusters and points
+        map.on('mouseenter', 'clusters', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'clusters', () => {
+            map.getCanvas().style.cursor = '';
+        });
+        map.on('mouseenter', 'point-layer', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'point-layer', () => {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+    
+   
+</script>
+  
+    
+    <!--Page 2 3D js--->
+<script>
+ // Load the CSV file with D3
+d3.csv("https://raw.githubusercontent.com/Aprilmiaoyilee/casa0003_individual/main/language_by_country_stats.csv", function(error, data) {
+  if (error) {
+    console.error("Error loading CSV:", error);
+    document.getElementById("error-message").textContent = "Failed to load data";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+
+  // Fix form field error
+  document.getElementById("country-input").setAttribute("name", "country-input");
+
+  // Store current country selection for resize handling
+  window.currentCountry = "";
+
+  // Define default country - force it to be Afghanistan
+  var defaultCountry = "Afghanistan";
+  
+  // Get all country names and sort them alphabetically
+  var countries = data.map(function(d) { return d.country; }).sort();
+  
+  // Verify Afghanistan exists in the data, if not, use first country
+  var afghanistanExists = countries.includes(defaultCountry);
+  if (!afghanistanExists && countries.length > 0) {
+    console.log("Afghanistan not found in dataset, using first country");
+    defaultCountry = countries[0];
+  } else {
+    console.log("Setting default country to Afghanistan");
+  }
+  
+  // Immediately set the input value to the default country
+  console.log("Setting input value to:", defaultCountry);
+  document.getElementById("country-input").value = defaultCountry;
+  
+  // Populate the country list
+  var countryList = d3.select("#country-list");
+  countryList.html(""); // Clear existing items first
+  
+  countries.forEach(function(country) {
+    countryList.append("li")
+      .text(country)
+      .on("click", function() {
+        d3.select("#country-input").property("value", country);
+        updateChart(country);
+        hideCountryList();
+      });
+  });
+  
+  // Function to filter the country list based on input
+  function filterCountryList() {
+    var input = d3.select("#country-input").property("value");
+    var filter = input.toUpperCase();
+    var lis = countryList.selectAll("li");
+    
+    var isMatch = false;
+    
+    lis.each(function() {
+      var li = d3.select(this);
+      var txtValue = li.text();
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li.style("display", "");
+        isMatch = true;
+      } else {
+        li.style("display", "none");
+      }
+    });
+    
+    if (input && isMatch) {
+      showCountryList();
+    } else {
+      hideCountryList();
+    }
+  }
+  
+  function showCountryList() {
+    countryList.style("display", "block");
+  }
+  
+  function hideCountryList() {
+    countryList.style("display", "none");
+  }
+  
+  // Event listener for input field
+  d3.select("#country-input")
+    .on("input", filterCountryList)
+    .on("focus", function() {
+      if (d3.select(this).property("value")) {
+        showCountryList();
+      }
+    });
+  
+  // Event listener for clicking outside of the search area
+  d3.select("body").on("click", function() {
+    if (d3.event.target.id !== "country-input") {
+      hideCountryList();
+    }
+  });
+  
+  // Event listener for Enter key in the input field
+  d3.select("#country-input").on("keyup", function() {
+    if (d3.event.keyCode === 13) { // Enter key
+      var countryName = d3.select(this).property("value").trim();
+      if (countryName) {
+        updateChart(countryName);
+        hideCountryList();
+      }
+    }
+  });
+
+  // Define categories and their display names
+  var categories = [
+    {key: "at_risk", name: "At Risk"},
+    {key: "endangered", name: "Endangered"},
+    {key: "critically_endangered", name: "Critically Endangered"},
+    {key: "dormant", name: "Dormant"},
+    {key: "awakening", name: "Awakening"},
+    {key: "unknown", name: "Unknown"}
+  ];
+
+  // Define colors for different categories
+  var colors = {
+    at_risk: "#8CC63F",
+    endangered: "#F7941D",
+    critically_endangered: "#ED1C24",
+    dormant: "#00AEEF",
+    awakening: "#662D91",
+    unknown: "#939598"
+  };
+
+  // Convert string values to numbers
+  data.forEach(function(d) {
+    categories.forEach(function(cat) {
+      // Convert to number and ensure it's valid
+      d[cat.key] = isNaN(+d[cat.key]) ? 0 : Math.max(0, +d[cat.key]);
+    });
+  });
+
+  // Ensure chart container has proper dimensions before rendering
+  function ensureContainerDimensions() {
+    var chartContent = document.querySelector('.chart-content');
+    if (!chartContent) return false;
+    
+    // Set explicit height if needed
+    if (chartContent.clientHeight < 200) {
+      chartContent.style.height = "300px";
+    }
+    
+    // Set explicit width if needed
+    if (chartContent.clientWidth < 200) {
+      chartContent.style.width = "100%";
+    }
+    
+    // Ensure the inner container is also properly sized
+    var dataviz = document.getElementById('my_dataviz');
+    if (dataviz) {
+      dataviz.style.width = "100%";
+      dataviz.style.height = "100%";
+      dataviz.style.minHeight = "200px";
+    }
+    
+    return chartContent.clientWidth > 0 && chartContent.clientHeight > 0;
+  }
+
+  // Function to update the chart for a given country
+  window.updateChart = function(countryName) {
+    console.log("Updating chart for:", countryName);
+    window.currentCountry = countryName;
+    
+    // Ensure container has proper dimensions before rendering
+    if (!ensureContainerDimensions()) {
+      console.error("Container dimensions not ready, retrying in 300ms");
+      setTimeout(function() {
+        updateChart(countryName);
+      }, 300);
+      return;
+    }
+    
+    // Get the chart container dimensions
+    var chartContent = document.querySelector('.chart-content');
+    var containerWidth = chartContent.clientWidth;
+    var containerHeight = chartContent.clientHeight;
+    
+    console.log("Container dimensions:", containerWidth, "x", containerHeight);
+    
+    // Set margins with additional padding to avoid negative values
+    var margin = {top: 30, right: 20, bottom: 60, left: 40};
+    var width = containerWidth - margin.left - margin.right;
+    var height = containerHeight - margin.top - margin.bottom;
+    
+    console.log("Chart dimensions:", width, "x", height);
+    
+    // Remove any existing SVG to start fresh
+    d3.select("#my_dataviz").html("");
+    
+    // Create SVG with explicit dimensions
+    var svg = d3.select("#my_dataviz")
+      .append("svg")
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    // Find the country data
+    var countryData = data.find(function(d) { 
+      return d.country.toLowerCase() === countryName.toLowerCase(); 
+    });
+    
+    if (!countryData) {
+      d3.select("#error-message").style("display", "block");
+      return;
+    } else {
+      d3.select("#error-message").style("display", "none");
+    }
+    
+    // Prepare data for chart
+    var chartData = categories.map(function(cat) {
+      return {
+        category: cat.name,
+        value: countryData[cat.key],
+        color: colors[cat.key]
+      };
+    });
+    
+    console.log("Chart data:", chartData);
+    
+    // Add title
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", 0)
+      .attr("text-anchor", "middle")
+      .style("font-size", "14px")
+      .style("fill", "#ECDFCC")
+      .text("Endangered Languages in " + countryData.country);
+    
+    // X axis
+    var x = d3.scaleBand()
+      .range([0, width])
+      .padding(0.3)
+      .domain(chartData.map(function(d) { return d.category; }));
+    
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .attr("transform", "translate(-10,5)rotate(-30)")
+      .style("text-anchor", "end")
+      .style("fill", "#ECDFCC")
+      .style("font-size", "8px");
+    
+    // Make sure axis lines are visible
+    svg.selectAll(".domain, .tick line")
+      .style("stroke", "#ECDFCC");
+    
+    // Find max value for y domain
+    var maxValue = d3.max(chartData, function(d) { return d.value; });
+    maxValue = maxValue > 0 ? maxValue : 1; // Ensure non-zero scale
+    
+    // Y axis
+    var y = d3.scaleLinear()
+      .domain([0, maxValue * 1.1]) // Add 10% padding
+      .range([height, 0]);
+    
+    svg.append("g")
+      .call(d3.axisLeft(y).ticks(5))
+      .selectAll("text")
+      .style("fill", "#ECDFCC")
+      .style("font-size", "8px");
+    
+    // Style axis lines
+    svg.selectAll(".domain, .tick line")
+      .style("stroke", "#ECDFCC");
+    
+    // Create bars with simple animation
+    svg.selectAll(".bar")
+      .data(chartData)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.category); })
+      .attr("width", x.bandwidth())
+      .attr("y", height) // Start at bottom
+      .attr("height", 0) // Start with no height
+      .attr("fill", function(d) { return d.color; })
+      .transition() // Add transition
+      .duration(800)
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); });
+    
+    // Add labels above bars with delay to ensure they appear after bars
+    setTimeout(function() {
+      svg.selectAll(".label")
+        .data(chartData)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .attr("text-anchor", "middle")
+        .attr("x", function(d) { return x(d.category) + x.bandwidth() / 2; })
+        .attr("y", function(d) { return y(d.value) - 5; })
+        .text(function(d) { return d.value > 0 ? d.value : ""; })
+        .style("fill", "#ECDFCC")
+        .style("font-size", "10px");
+    }, 850);
+  }
+  
+ 
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    if (window.currentCountry) {
+      updateChart(window.currentCountry);
+    } else {
+      updateChart(defaultCountry);
+    }
+  });
+    
+    
+  //Function to check if Page 2 is active and load chart if needed
+  function checkAndLoadChart() {
+    if (window.page2Active || document.getElementById('page2').classList.contains('active')) {
+        console.log("Loading Afghanistan chart for Page 2");
+        document.getElementById("country-input").value = "Afghanistan";
+        updateChart("Afghanistan");
+        // Reset flag to avoid duplicate loading
+        window.page2Active = false;
+    }
+}
+
+// Check immediately after D3 is initialized
+checkAndLoadChart();
+
+// Add event listener to the page2 navigation button
+var navButton = document.querySelector('.nav-button[onclick="showPage(2)"]');
+if (navButton) {
+    navButton.addEventListener('click', function() {
+        // Short delay to ensure the page has switched
+        setTimeout(checkAndLoadChart, 300);
+    });
+}
+
+// Also check when window is fully loaded or resized
+window.addEventListener('load', checkAndLoadChart);
+window.addEventListener('resize', function() {
+    if (document.getElementById('page2').classList.contains('active')) {
+        document.getElementById("country-input").value = "Afghanistan";
+        updateChart(document.getElementById("country-input").value || "Afghanistan");
+    }
+});    
+    
+    
+    
+    
+});
+ 
+
+    
+    
+</script>    
+    
+</body>
+</html>
