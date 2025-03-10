@@ -990,14 +990,7 @@ d3.csv("https://raw.githubusercontent.com/Aprilmiaoyilee/casa0003_individual/mai
     console.log("Updating chart for:", countryName);
     window.currentCountry = countryName;
     
-    // Ensure container has proper dimensions before rendering
-    if (!ensureContainerDimensions()) {
-      console.error("Container dimensions not ready, retrying in 300ms");
-      setTimeout(function() {
-        updateChart(countryName);
-      }, 300);
-      return;
-    }
+
     
     // Get the chart container dimensions
     var chartContent = document.querySelector('.chart-content');
