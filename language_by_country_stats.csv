@@ -1,0 +1,175 @@
+country,at_risk,endangered,critically_endangered,dormant,awakening,unknown
+Afghanistan,0,19,1,3,0,1
+Albania,5,2,0,0,0,0
+Algeria,1,7,0,0,0,0
+Angola,0,11,0,0,0,0
+Argentina,1,15,1,5,0,3
+Australia,0,45,194,73,36,0
+Austria,4,2,0,0,0,0
+Azerbaijan,1,9,1,0,0,0
+Bangladesh,0,10,0,0,0,0
+Belarus,5,1,0,0,0,0
+Belgium,0,4,0,0,0,0
+Belize,5,2,0,0,0,0
+Benin,0,4,0,0,0,0
+Bhutan,0,13,2,0,0,0
+Bolivia,2,16,8,7,0,3
+Bosnia and Herzegovina,5,2,0,0,0,0
+Botswana,0,23,2,0,0,0
+Brazil,0,105,37,15,1,18
+Brunei,0,1,3,0,0,0
+Bulgaria,5,8,1,0,0,0
+Burkina Faso,0,4,0,0,0,0
+Cambodia,0,10,4,0,0,0
+Cameroon,1,44,15,1,0,1
+Canada,1,32,71,0,0,0
+Central African Republic,0,12,0,0,0,0
+Chad,0,36,7,0,0,0
+Chile,0,3,1,1,0,1
+China,4,130,48,0,0,1
+Colombia,0,52,9,4,0,14
+Comoros,0,1,0,0,0,0
+Congo,0,7,0,0,0,0
+Cook Islands,0,5,1,0,0,0
+Costa Rica,0,4,1,0,1,3
+Croatia,5,2,1,0,0,0
+Cyprus,0,1,0,0,0,0
+Czech Republic,4,3,0,0,0,0
+Côte d'Ivoire,0,5,2,0,0,0
+Democratic Republic of the Congo,0,9,1,0,0,0
+Denmark,0,2,0,0,0,0
+East Timor,1,8,1,0,0,0
+Ecuador,1,9,1,1,0,1
+Egypt,0,4,0,0,0,0
+El Salvador,0,1,1,0,0,0
+Equatorial Guinea,0,2,1,0,0,0
+Eritrea,0,1,1,0,0,0
+Estonia,0,2,0,0,0,0
+Ethiopia,0,32,4,0,0,0
+Fiji,0,1,0,0,0,0
+Finland,4,9,1,0,0,0
+France,8,9,2,0,0,0
+French Guiana,0,5,3,0,0,1
+French Polynesia,0,7,1,0,0,0
+Gabon,0,12,2,0,0,0
+Gambia,0,2,0,0,0,0
+Georgia,1,5,3,0,0,0
+Germany,4,7,0,0,0,0
+Ghana,0,10,2,0,0,0
+Greece,5,8,4,0,0,0
+Guam,0,2,0,0,0,0
+Guatemala,4,24,1,2,1,0
+Guinea,0,9,1,0,0,0
+Guinea-Bissau,0,5,1,0,0,0
+Guyana,0,7,5,1,0,2
+Honduras,5,3,0,1,0,1
+Hungary,4,2,0,0,0,0
+India,20,172,10,2,0,1
+Indonesia,3,194,56,2,0,4
+Iran,3,31,6,0,0,14
+Iraq,0,4,2,0,0,0
+Ireland,0,3,0,0,0,0
+Israel,4,8,1,1,0,0
+Italy,7,12,1,0,0,0
+Jamaica,0,1,0,0,0,0
+Japan,0,3,12,0,0,0
+Kazakhstan,0,2,1,0,0,0
+Kenya,2,8,3,2,0,0
+Kiribati,0,1,0,0,0,0
+Kuwait,1,0,0,0,0,0
+Kyrgyzstan,0,5,0,0,0,0
+Laos,0,28,5,0,0,2
+Latvia,4,1,0,0,1,0
+Lebanon,0,1,0,0,0,0
+Lesotho,0,1,0,0,0,0
+Libya,0,7,0,1,0,0
+Liechtenstein,0,1,0,0,0,0
+Lithuania,4,5,1,0,0,0
+Luxembourg,0,1,0,0,0,0
+Macedonia,5,5,0,0,0,0
+Madagascar,0,1,0,0,0,0
+Malaysia,0,34,8,1,0,0
+Mali,0,21,0,0,0,1
+Mauritania,0,0,1,0,0,0
+Mayotte,0,1,0,0,0,0
+Mexico,16,95,12,3,0,6
+Micronesia,0,12,1,0,0,0
+Moldova,2,1,0,0,0,0
+Mongolia,1,9,5,0,0,0
+Montenegro,4,1,0,0,0,0
+Morocco,1,2,1,0,0,0
+Mozambique,0,2,0,0,0,0
+Myanmar,2,28,2,1,0,1
+Namibia,0,20,1,0,0,0
+Nauru,0,4,0,0,0,0
+Nepal,0,63,11,0,1,0
+Netherlands,5,3,0,0,0,0
+New Caledonia,0,14,4,0,1,0
+New Zealand,0,11,0,0,0,0
+Nicaragua,1,3,0,0,0,1
+Niger,0,3,1,0,0,0
+Nigeria,3,104,21,6,0,2
+Niue,0,1,0,0,0,0
+Norfolk Island,0,1,0,0,0,0
+Northern Mariana Islands,0,5,0,0,0,0
+Norway,1,4,3,0,0,0
+Oman,1,4,1,0,0,0
+Pakistan,3,22,1,0,0,1
+Palau,0,1,1,0,0,0
+Panama,0,8,0,0,0,4
+Papua New Guinea,0,284,60,3,0,0
+Paraguay,0,13,2,0,0,1
+Peru,2,35,16,7,0,9
+Philippines,0,9,10,0,0,0
+Pitcairn,0,1,0,0,0,0
+Poland,4,5,0,0,0,0
+Portugal,6,2,1,0,0,0
+Puerto Rico,1,1,0,0,0,0
+Romania,5,7,1,0,0,0
+Russia,6,65,47,4,2,0
+Réunion,0,1,0,0,0,0
+Senegal,0,16,0,0,0,0
+Serbia,5,2,0,0,0,0
+Sierra Leone,0,0,3,0,0,0
+Singapore,0,2,1,0,0,0
+Slovakia,4,1,0,0,0,0
+Slovenia,4,1,0,0,0,0
+Solomon Islands,0,16,10,1,0,0
+Somalia,0,2,1,0,0,0
+South Africa,0,12,4,0,0,0
+South Korea,0,1,0,0,0,0
+South Sudan,0,17,2,0,0,0
+Spain,7,3,0,0,0,0
+Sri Lanka,0,2,0,1,0,0
+Sudan,0,41,1,1,0,0
+Suriname,0,5,4,1,0,3
+Sweden,1,6,2,0,0,0
+Switzerland,4,7,0,0,0,0
+Syria,0,2,0,1,0,0
+Taiwan,0,6,13,0,1,0
+Tajikistan,0,13,0,0,0,0
+Tanzania,1,19,3,2,0,0
+Thailand,0,18,7,1,0,2
+Togo,0,5,0,0,0,0
+Tokelau,0,4,0,0,0,0
+Tonga,0,1,0,0,0,0
+Tunisia,1,1,0,0,0,0
+Turkey,5,12,0,1,0,0
+Turkmenistan,0,1,0,0,0,0
+Tuvalu,0,1,0,0,0,0
+USA,3,73,91,17,23,16
+Uganda,0,2,2,0,0,0
+Ukraine,5,7,2,0,0,0
+United Arab Emirates,0,1,0,0,0,0
+United Kingdom,3,10,0,0,2,0
+Uruguay,0,2,0,0,0,0
+Uzbekistan,1,8,0,0,0,0
+Vanuatu,0,69,29,3,0,0
+Venezuela,0,24,11,2,0,5
+Vietnam,0,33,20,1,0,0
+Western Sahara,0,0,1,0,0,0
+Yemen,1,3,1,0,0,0
+Zambia,0,7,0,0,0,1
+Zimbabwe,0,5,0,0,0,0
+caledonia,0,1,0,0,0,0
+unknown,0,5,3,1,1,0
